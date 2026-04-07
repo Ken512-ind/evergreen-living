@@ -40,6 +40,9 @@ function PlantDetail() {
             src={plant.image}
             alt={plant.name}
             loading="lazy"
+            onError={(e) => {
+              e.target.src = "/fallback.jpg";
+            }}
             className="rounded-xl shadow-md"
           />
 

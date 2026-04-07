@@ -1,12 +1,7 @@
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTopButton from "./components/ScrollToTopButton";
-
-import Home from "./pages/Home";
-import IndoorPlants from "./pages/IndoorPlants";
-import HerbalPlants from "./pages/HerbalPlants";
-import PlantDetail from "./pages/PlantDetail";
-
+import ErrorBoundary from "./components/ErrorBoundary";
 import PageWrapper from "./components/PageWrapper";
 
 import {
@@ -17,64 +12,131 @@ import {
 
 import { AnimatePresence } from "framer-motion";
 
+import {
+  lazy,
+  Suspense,
+} from "react";
+
+import useScrollRestore from "./hooks/useScrollRestore";
+
+/* Lazy load pages */
+
+const Home = lazy(() =>
+  import("./pages/Home")
+);
+
+const IndoorPlants = lazy(() =>
+  import("./pages/IndoorPlants")
+);
+
+const HerbalPlants = lazy(() =>
+  import("./pages/HerbalPlants")
+);
+
+const PlantDetail = lazy(() =>
+  import("./pages/PlantDetail")
+);
+
+const NotFound = lazy(() =>
+  import("./pages/NotFound")
+);
+
 function App() {
+  useScrollRestore();
+
   const location = useLocation();
 
   return (
-    <>
+    <ErrorBoundary>
+
       <Navbar />
 
-      <AnimatePresence mode="wait">
+      <main className="min-h-screen">
 
-        <Routes
-          location={location}
-          key={location.pathname}
+        {/* Loading fallback */}
+
+        <Suspense
+          fallback={
+            <div className="
+              min-h-screen
+              flex
+              items-center
+              justify-center
+            ">
+              <p className="text-gray-500">
+                Loading...
+              </p>
+            </div>
+          }
         >
-          <Route
-            path="/"
-            element={
-              <PageWrapper>
-                <Home />
-              </PageWrapper>
-            }
-          />
 
-          <Route
-            path="/indoor"
-            element={
-              <PageWrapper>
-                <IndoorPlants />
-              </PageWrapper>
-            }
-          />
+          <AnimatePresence mode="wait">
 
-          <Route
-            path="/herbal"
-            element={
-              <PageWrapper>
-                <HerbalPlants />
-              </PageWrapper>
-            }
-          />
+            <Routes
+              location={location}
+              key={location.pathname}
+            >
 
-          <Route
-            path="/plant/:slug"
-            element={
-              <PageWrapper>
-                <PlantDetail />
-              </PageWrapper>
-            }
-          />
+              <Route
+                path="/"
+                element={
+                  <PageWrapper>
+                    <Home />
+                  </PageWrapper>
+                }
+              />
 
-        </Routes>
+              <Route
+                path="/indoor"
+                element={
+                  <PageWrapper>
+                    <IndoorPlants />
+                  </PageWrapper>
+                }
+              />
 
-      </AnimatePresence>
+              <Route
+                path="/herbal"
+                element={
+                  <PageWrapper>
+                    <HerbalPlants />
+                  </PageWrapper>
+                }
+              />
+
+              <Route
+                path="/plant/:slug"
+                element={
+                  <PageWrapper>
+                    <PlantDetail />
+                  </PageWrapper>
+                }
+              />
+
+              {/* 404 */}
+
+              <Route
+                path="*"
+                element={
+                  <PageWrapper>
+                    <NotFound />
+                  </PageWrapper>
+                }
+              />
+
+            </Routes>
+
+          </AnimatePresence>
+
+        </Suspense>
+
+      </main>
 
       <Footer />
 
       <ScrollToTopButton />
 
-    </>
+    </ErrorBoundary>
   );
 }
 

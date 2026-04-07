@@ -28,6 +28,9 @@ function PlantCard({
           src={image}
           alt={name}
           loading="lazy"
+          onError={(e) => {
+            e.target.src = "/fallback.jpg";
+          }}
           className="
             w-full
             h-48
