@@ -1,4 +1,9 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
+
 import { AnimatePresence } from "framer-motion";
 
 import Navbar from "./components/Navbar";
@@ -9,9 +14,9 @@ import HerbalPlants from "./pages/HerbalPlants";
 import PlantDetail from "./pages/PlantDetail";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import NotFound from "./pages/NotFound";
 
-import PageTransition from "./components/PageTransition";
+import AdminRoute from "./components/AdminRoute";
+import PageWrapper from "./components/PageWrapper";
 
 function App() {
   const location = useLocation();
@@ -21,7 +26,6 @@ function App() {
       <Navbar />
 
       <AnimatePresence mode="wait">
-
         <Routes
           location={location}
           key={location.pathname}
@@ -29,68 +33,60 @@ function App() {
           <Route
             path="/"
             element={
-              <PageTransition>
+              <PageWrapper>
                 <Home />
-              </PageTransition>
+              </PageWrapper>
             }
           />
 
           <Route
             path="/indoor"
             element={
-              <PageTransition>
+              <PageWrapper>
                 <IndoorPlants />
-              </PageTransition>
+              </PageWrapper>
             }
           />
 
           <Route
             path="/herbal"
             element={
-              <PageTransition>
+              <PageWrapper>
                 <HerbalPlants />
-              </PageTransition>
+              </PageWrapper>
             }
           />
 
           <Route
             path="/plant/:slug"
             element={
-              <PageTransition>
+              <PageWrapper>
                 <PlantDetail />
-              </PageTransition>
+              </PageWrapper>
             }
           />
 
           <Route
             path="/login"
             element={
-              <PageTransition>
+              <PageWrapper>
                 <Login />
-              </PageTransition>
+              </PageWrapper>
             }
           />
 
           <Route
             path="/dashboard"
             element={
-              <PageTransition>
-                <Dashboard />
-              </PageTransition>
-            }
-          />
-
-          <Route
-            path="*"
-            element={
-              <PageTransition>
-                <NotFound />
-              </PageTransition>
+              <AdminRoute>
+                <PageWrapper>
+                  <Dashboard />
+                </PageWrapper>
+              </AdminRoute>
             }
           />
 
         </Routes>
-
       </AnimatePresence>
     </>
   );

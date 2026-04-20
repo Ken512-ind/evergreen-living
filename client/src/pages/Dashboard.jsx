@@ -1,142 +1,159 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import {
   getPlants,
   deletePlant,
 } from "../services/plantService";
 
-import { Link } from "react-router-dom";
-
 function Dashboard() {
-  const [plants, setPlants] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [plants, setPlants] =
+    useState([]);
+
+  /*
+  GET USER
+  */
+  const storedUser =
+    localStorage.getItem("user");
+
+  const user =
+    storedUser
+      ? JSON.parse(storedUser)
+      : null;
+
+  const isAdmin =
+    user &&
+    user.role === "admin";
+
+  /*
+  FETCH DATA
+  */
+  const fetchPlants =
+    async () => {
+      try {
+        const data =
+          await getPlants();
+
+        setPlants(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
   useEffect(() => {
     fetchPlants();
   }, []);
 
-  const fetchPlants = async () => {
-    try {
-      const data = await getPlants();
-      setPlants(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  /*
+  DELETE
+  */
+  const handleDelete =
+    async (id) => {
+      if (
+        !window.confirm(
+          "Yakin ingin menghapus?"
+        )
+      )
+        return;
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Yakin ingin menghapus tanaman ini?"
-    );
+      try {
+        await deletePlant(id);
 
-    if (!confirmDelete) return;
-
-    try {
-      await deletePlant(id);
-      fetchPlants();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="text-center py-20">
-        Loading...
-      </div>
-    );
-  }
+        fetchPlants();
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+    <div className="p-6">
 
       <div className="flex justify-between items-center mb-6">
 
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-2xl font-bold">
           Dashboard
         </h1>
 
-        <Link
-          to="/add-plant"
-          className="bg-green-600 text-white px-4 py-2 rounded-lg"
-        >
-          Add Plant
-        </Link>
+        {isAdmin && (
+          <button className="bg-green-600 text-white px-4 py-2 rounded">
+            Add Plant
+          </button>
+        )}
 
       </div>
 
-      <div className="overflow-x-auto">
+      <table className="w-full border">
 
-        <table className="w-full bg-white rounded-xl shadow">
+        <thead>
 
-          <thead>
+          <tr className="bg-gray-100">
 
-            <tr className="bg-gray-100 text-left">
+            <th className="p-2 text-left">
+              Name
+            </th>
 
-              <th className="p-3">
-                Name
-              </th>
+            <th className="p-2 text-left">
+              Category
+            </th>
 
-              <th className="p-3">
-                Category
-              </th>
-
-              <th className="p-3">
+            {isAdmin && (
+              <th className="p-2 text-left">
                 Actions
               </th>
+            )}
 
-            </tr>
+          </tr>
 
-          </thead>
+        </thead>
 
-          <tbody>
+        <tbody>
 
-            {plants.map((plant) => (
-
+          {plants.map(
+            (plant) => (
               <tr
                 key={plant._id}
                 className="border-t"
               >
-
-                <td className="p-3">
+                <td className="p-2">
                   {plant.name}
                 </td>
 
-                <td className="p-3">
+                <td className="p-2">
                   {plant.category}
                 </td>
 
-                <td className="p-3 space-x-2">
+                {isAdmin && (
+                  <td className="p-2 flex gap-2">
 
-                  <Link
-                    to={`/edit-plant/${plant._id}`}
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
-                  >
-                    Edit
-                  </Link>
+                    <button
+                      className="bg-blue-500 text-white px-3 py-1 rounded"
+                    >
+                      Edit
+                    </button>
 
-                  <button
-                    onClick={() =>
-                      handleDelete(plant._id)
-                    }
-                    className="bg-red-500 text-white px-3 py-1 rounded"
-                  >
-                    Delete
-                  </button>
+                    <button
+                      onClick={() =>
+                        handleDelete(
+                          plant._id
+                        )
+                      }
+                      className="bg-red-500 text-white px-3 py-1 rounded"
+                    >
+                      Delete
+                    </button>
 
-                </td>
+                  </td>
+                )}
 
               </tr>
+            )
+          )}
 
-            ))}
+        </tbody>
 
-          </tbody>
-
-        </table>
-
-      </div>
+      </table>
 
     </div>
   );

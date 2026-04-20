@@ -1,48 +1,74 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-
 import { loginUser } from "../services/authService";
 
 function Login() {
-  const navigate = useNavigate();
-
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
 
+  const [loading, setLoading] =
+    useState(false);
+
+  /*
+  HANDLE INPUT
+  */
   const handleChange = (e) => {
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+        e.target.value,
     });
   };
 
+  /*
+  HANDLE LOGIN
+  */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const data = await loginUser(form);
+    setLoading(true);
 
+    try {
+      const data =
+        await loginUser(form);
+
+      /*
+      SIMPAN USER
+      */
       localStorage.setItem(
-        "token",
-        data.token
+        "user",
+        JSON.stringify(
+          data.user
+        )
       );
 
-      navigate("/dashboard");
+      alert(
+        "Login berhasil"
+      );
 
-      window.location.reload();
+      /*
+      REFRESH + KEMBALI KE HOME
+      */
+      window.location.href =
+        "/";
+
     } catch (error) {
-      alert("Login gagal");
+      alert(
+        error.message ||
+          "Login gagal"
+      );
     }
+
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
 
       <motion.div
-        className="w-full max-w-md bg-white p-8 rounded-xl shadow"
         initial={{
           opacity: 0,
           y: 40,
@@ -52,22 +78,31 @@ function Login() {
           y: 0,
         }}
         transition={{
-          duration: 0.35,
+          duration: 0.4,
         }}
+        className="bg-white p-8 rounded-xl shadow-md w-96"
       >
         <h2 className="text-2xl font-bold text-center mb-6">
           Login
         </h2>
 
-        <form onSubmit={handleSubmit}>
-
+        <form
+          onSubmit={
+            handleSubmit
+          }
+        >
           <input
             type="email"
             name="email"
             placeholder="Email"
             required
-            onChange={handleChange}
-            className="w-full border p-3 rounded-lg mb-4"
+            value={
+              form.email
+            }
+            onChange={
+              handleChange
+            }
+            className="w-full border p-2 mb-3 rounded"
           />
 
           <input
@@ -75,22 +110,39 @@ function Login() {
             name="password"
             placeholder="Password"
             required
-            onChange={handleChange}
-            className="w-full border p-3 rounded-lg mb-6"
+            value={
+              form.password
+            }
+            onChange={
+              handleChange
+            }
+            className="w-full border p-2 mb-4 rounded"
           />
 
-          <motion.button
+          <button
             type="submit"
-            className="w-full bg-green-600 text-white py-3 rounded-lg"
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
+            disabled={
+              loading
+            }
+            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
           >
-            Login
-          </motion.button>
-
+            {loading
+              ? "Loading..."
+              : "Login"}
+          </button>
         </form>
-      </motion.div>
 
+        <p className="text-sm text-center mt-4">
+          Belum punya akun?
+          <Link
+            to="/register"
+            className="text-green-600 ml-1 hover:underline"
+          >
+            Daftar
+          </Link>
+        </p>
+
+      </motion.div>
     </div>
   );
 }

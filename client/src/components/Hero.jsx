@@ -1,43 +1,69 @@
-import plantHero from "../assets/plant.png";
+import { motion } from "framer-motion";
+
+import heroImage from "../assets/hero-plant.png";
 
 function Hero() {
   return (
-    <section className="bg-green-900 text-white w-full">
+    <section className="bg-gradient-to-r from-green-700 to-green-500 text-white">
 
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-6 py-20 flex flex-col md:flex-row items-center">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+        {/* TEXT */}
 
-          <div>
+        <motion.div
+          initial={{
+            opacity: 0,
+            x: -40,
+          }}
+          animate={{
+            opacity: 1,
+            x: 0,
+          }}
+          transition={{
+            duration: 0.6,
+          }}
+          className="flex-1"
+        >
+          <h1 className="text-5xl font-bold mb-6 leading-tight">
+            Bring Nature Closer
+            <br />
+            to Your Life
+          </h1>
 
-            <h1 className="text-3xl md:text-5xl font-bold mb-6">
-              Bring Nature Closer
-              to Your Life
-            </h1>
+          <p className="text-lg mb-8 text-green-100">
+            Ciptakan suasana yang asri dan menenangkan
+            melalui berbagai tanaman hias dan herbal
+            untuk rumah yang lebih sehat dan segar.
+          </p>
 
-            <p className="text-base md:text-lg mb-8">
-              Ciptakan suasana yang asri dan menenangkan melalui berbagai
-              tumbuhan pajangan dan tanaman herbal untuk rumah yang
-              lebih sehat dan segar.
-            </p>
+          <button className="bg-white text-green-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+            Explore More
+          </button>
 
-            <button className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg">
-              Explore More
-            </button>
+        </motion.div>
 
-          </div>
+        {/* IMAGE */}
 
-          <div className="flex justify-center">
-
-            <img
-              src={plantHero}
-              alt="Plant"
-              className="w-full max-w-md"
-            />
-
-          </div>
-
-        </div>
+        <motion.div
+          initial={{
+            opacity: 0,
+            x: 40,
+          }}
+          animate={{
+            opacity: 1,
+            x: 0,
+          }}
+          transition={{
+            duration: 0.6,
+          }}
+          className="flex-1 mt-10 md:mt-0 flex justify-center"
+        >
+          <img
+            src={heroImage}
+            alt="Plant"
+            className="w-80 md:w-96 drop-shadow-xl"
+          />
+        </motion.div>
 
       </div>
 

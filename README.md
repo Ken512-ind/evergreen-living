@@ -29,3 +29,11 @@ Today's development focused on improving system functionality and user experienc
 * Improved responsive layout for mobile and desktop
 * Enhanced hover animation on plant cards
 
+## Latest Update
+
+- Implemented user authentication (login & register)
+- Added admin route protection for dashboard
+- Added logout functionality
+- Implemented page transition animations using Framer Motion
+- Improved navbar and homepage UI
+- Added role-based access control for edit and delete actions
