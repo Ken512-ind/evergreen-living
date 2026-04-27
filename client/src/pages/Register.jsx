@@ -6,144 +6,130 @@ import { registerUser } from "../services/authService";
 function Register() {
   const navigate = useNavigate();
 
-  const [name, setName] =
-    useState("");
-
-  const [email, setEmail] =
-    useState("");
-
-  const [password, setPassword] =
-    useState("");
-
-  const [error, setError] =
-    useState("");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
   const [loading, setLoading] =
     useState(false);
 
+  /*
+  HANDLE INPUT
+  */
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]:
+        e.target.value,
+    });
+  };
+
+  /*
+  SUBMIT REGISTER
+  */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setError("");
-    setLoading(true);
-
     try {
-      await registerUser(
-        name,
-        email,
-        password
+      setLoading(true);
+
+      await registerUser(form);
+
+      alert(
+        "Registrasi berhasil"
       );
 
       navigate("/login");
 
-    } catch (err) {
-      setError(err.message);
+    } catch (error) {
+      alert(
+        error.response?.data
+          ?.message ||
+          "Register gagal"
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
 
-      <div className="bg-white p-8 rounded-xl shadow w-full max-w-md">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-lg shadow w-full max-w-md"
+      >
 
-        <h1 className="text-2xl font-bold text-green-800 mb-6 text-center">
+        <h2 className="text-2xl font-bold mb-6 text-center">
           Register
-        </h1>
+        </h2>
 
-        {error && (
-          <p className="text-red-500 mb-4">
-            {error}
-          </p>
-        )}
+        {/* NAME */}
 
-        <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Nama"
+          value={form.name}
+          onChange={handleChange}
+          required
+          className="w-full mb-4 px-4 py-2 border rounded"
+        />
 
-          <div className="mb-4">
+        {/* EMAIL */}
 
-            <label className="block mb-2">
-              Name
-            </label>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          required
+          className="w-full mb-4 px-4 py-2 border rounded"
+        />
 
-            <input
-              type="text"
-              value={name}
-              onChange={(e) =>
-                setName(e.target.value)
-              }
-              required
-              className="w-full border px-4 py-2 rounded"
-            />
+        {/* PASSWORD */}
 
-          </div>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+          required
+          className="w-full mb-6 px-4 py-2 border rounded"
+        />
 
-          <div className="mb-4">
+        {/* BUTTON */}
 
-            <label className="block mb-2">
-              Email
-            </label>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+        >
+          {loading
+            ? "Loading..."
+            : "Register"}
+        </button>
 
-            <input
-              type="email"
-              value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
-              required
-              className="w-full border px-4 py-2 rounded"
-            />
+        <p className="text-center mt-4">
 
-          </div>
-
-          <div className="mb-6">
-
-            <label className="block mb-2">
-              Password
-            </label>
-
-            <input
-              type="password"
-              value={password}
-              onChange={(e) =>
-                setPassword(
-                  e.target.value
-                )
-              }
-              required
-              className="w-full border px-4 py-2 rounded"
-            />
-
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-700 text-white py-2 rounded hover:bg-green-800"
-          >
-            {loading
-              ? "Registering..."
-              : "Register"}
-          </button>
-
-        </form>
-
-        <p className="mt-4 text-center">
-
-          Already have an account?
+          Sudah punya akun?
 
           <Link
             to="/login"
-            className="text-green-700 ml-1"
+            className="text-green-600 ml-1"
           >
             Login
           </Link>
 
         </p>
 
-      </div>
+      </form>
 
-    </section>
+    </div>
   );
 }
 

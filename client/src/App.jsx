@@ -18,6 +18,9 @@ import Dashboard from "./pages/Dashboard";
 import AdminRoute from "./components/AdminRoute";
 import PageWrapper from "./components/PageWrapper";
 
+import Register from "./pages/Register";
+import AddPlant from "./pages/AddPlant";
+
 function App() {
   const location = useLocation();
 
@@ -76,11 +79,31 @@ function App() {
           />
 
           <Route
+            path="/register"
+            element={
+              <PageWrapper>
+                <Register />
+              </PageWrapper>
+            }
+          />  
+
+          <Route
             path="/dashboard"
             element={
               <AdminRoute>
                 <PageWrapper>
                   <Dashboard />
+                </PageWrapper>
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/add-plant"
+            element={
+              <AdminRoute>
+                <PageWrapper>
+                  <AddPlant />
                 </PageWrapper>
               </AdminRoute>
             }

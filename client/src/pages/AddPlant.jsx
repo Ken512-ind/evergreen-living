@@ -1,110 +1,163 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import plantService from "../services/plantService";
+import {
+  useState,
+} from "react";
+
+import {
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  addPlant,
+} from "../services/plantService";
 
 function AddPlant() {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    latin: "",
-    category: "indoor",
-    image: "",
-    description: "",
-  });
-
-  /*
-  HANDLE INPUT
-  */
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+  const [form, setForm] =
+    useState({
+      name: "",
+      latin: "",
+      category: "",
+      description: "",
+      image: null,
     });
-  };
 
-  /*
-  SUBMIT
-  */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleChange =
+    (e) => {
+      const {
+        name,
+        value,
+        files,
+      } = e.target;
 
-    try {
-      await plantService.createPlant(formData);
+      if (name === "image") {
+        setForm({
+          ...form,
+          image:
+            files[0],
+        });
+      } else {
+        setForm({
+          ...form,
+          [name]:
+            value,
+        });
+      }
+    };
 
-      /*
-      REDIRECT
-      */
-      navigate("/dashboard");
+  const handleSubmit =
+    async (e) => {
+      e.preventDefault();
 
-    } catch (error) {
-      console.error("Failed to create plant", error);
-    }
-  };
+      try {
+        const formData =
+          new FormData();
+
+        Object.keys(
+          form
+        ).forEach(
+          (key) => {
+            formData.append(
+              key,
+              form[key]
+            );
+          }
+        );
+
+        await addPlant(
+          formData
+        );
+
+        alert(
+          "Plant added"
+        );
+
+        navigate(
+          "/dashboard"
+        );
+
+      } catch (error) {
+        alert(
+          "Error"
+        );
+      }
+    };
 
   return (
-    <div className="p-6 max-w-xl">
+    <div className="p-6 max-w-xl mx-auto">
 
       <h1 className="text-2xl font-bold mb-6">
         Add Plant
       </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form
+        onSubmit={
+          handleSubmit
+        }
+        className="space-y-4"
+      >
 
         <input
-          type="text"
           name="name"
-          placeholder="Plant name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
+          placeholder="Name"
+          onChange={
+            handleChange
+          }
+          className="w-full border p-2"
         />
 
         <input
-          type="text"
           name="latin"
-          placeholder="Latin name"
-          value={formData.latin}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
+          placeholder="Latin Name"
+          onChange={
+            handleChange
+          }
+          className="w-full border p-2"
         />
 
         <select
           name="category"
-          value={formData.category}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
+          onChange={
+            handleChange
+          }
+          className="w-full border p-2"
         >
-          <option value="indoor">Indoor</option>
-          <option value="herbal">Herbal</option>
-        </select>
+          <option>
+            Select Category
+          </option>
 
-        <input
-          type="text"
-          name="image"
-          placeholder="Image URL"
-          value={formData.image}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
-        />
+          <option value="indoor">
+            Indoor
+          </option>
+
+          <option value="herbal">
+            Herbal
+          </option>
+        </select>
 
         <textarea
           name="description"
           placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
+          onChange={
+            handleChange
+          }
+          className="w-full border p-2"
+        />
+
+        <input
+          type="file"
+          name="image"
+          onChange={
+            handleChange
+          }
+          className="w-full"
         />
 
         <button
-          type="submit"
           className="bg-green-600 text-white px-4 py-2 rounded"
         >
-          Save Plant
+          Submit
         </button>
 
       </form>

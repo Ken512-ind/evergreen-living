@@ -1,157 +1,75 @@
-const Plant = require("../models/Plant");
+const Plant =
+  require("../models/Plant");
 
 /*
-GET ALL PLANTS
+GET ALL
 */
-const getPlants = async (req, res) => {
-  try {
-    const plants = await Plant.find().sort({
-      createdAt: -1,
-    });
 
-    res.json(plants);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
+const getPlants =
+  async (req, res) => {
+    try {
+      console.log(
+        "GET PLANTS CALLED"
+      );
 
-/*
-GET PLANT BY SLUG
-*/
-const getPlantBySlug = async (req, res) => {
-  try {
-    const plant = await Plant.findOne({
-      slug: req.params.slug,
-    });
+      const plants =
+        await Plant.find();
 
-    if (!plant) {
-      return res.status(404).json({
-        message: "Plant not found",
+      res.json(plants);
+
+    } catch (error) {
+      console.error(
+        "ERROR getPlants:",
+        error.message
+      );
+
+      res.status(500).json({
+        message:
+          "Failed to fetch plants",
       });
     }
-
-    res.json(plant);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
+  };
 
 /*
-CREATE PLANT
+GET BY SLUG
 */
-const createPlant = async (req, res) => {
-  try {
-    const {
-      name,
-      latin,
-      category,
-      image,
-      description,
-    } = req.body;
 
-    const slug = name
-      .toLowerCase()
-      .replace(/\s+/g, "-");
+const getPlantBySlug =
+  async (req, res) => {
+    try {
+      const { slug } =
+        req.params;
 
-    const plant = await Plant.create({
-      name,
-      latin,
-      category,
-      image,
-      description,
-      slug,
-    });
+      const plant =
+        await Plant.findOne({
+          slug,
+        });
 
-    res.status(201).json({
-      message: "Plant created",
-      plant,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
+      if (!plant) {
+        return res
+          .status(404)
+          .json({
+            message:
+              "Plant not found",
+          });
+      }
 
-/*
-UPDATE PLANT
-*/
-const updatePlant = async (req, res) => {
-  try {
-    const plant = await Plant.findById(
-      req.params.id
-    );
+      res.json(plant);
 
-    if (!plant) {
-      return res.status(404).json({
-        message: "Plant not found",
+    } catch (error) {
+      console.error(
+        "ERROR getPlantBySlug:",
+        error.message
+      );
+
+      res.status(500).json({
+        message:
+          "Failed to fetch plant",
       });
     }
-
-    plant.name =
-      req.body.name || plant.name;
-
-    plant.latin =
-      req.body.latin || plant.latin;
-
-    plant.category =
-      req.body.category || plant.category;
-
-    plant.image =
-      req.body.image || plant.image;
-
-    plant.description =
-      req.body.description ||
-      plant.description;
-
-    await plant.save();
-
-    res.json({
-      message: "Plant updated",
-      plant,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
-
-/*
-DELETE PLANT
-*/
-const deletePlant = async (req, res) => {
-  try {
-    const plant = await Plant.findById(
-      req.params.id
-    );
-
-    if (!plant) {
-      return res.status(404).json({
-        message: "Plant not found",
-      });
-    }
-
-    await plant.deleteOne();
-
-    res.json({
-      message: "Plant deleted",
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
+  };
 
 module.exports = {
   getPlants,
   getPlantBySlug,
-  createPlant,
-  updatePlant,
-  deletePlant,
 };

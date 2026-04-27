@@ -1,33 +1,32 @@
-const API_URL =
-  "http://localhost:5000/api";
+import axios from "axios";
 
+const API =
+  "http://localhost:5000/api/auth";
+
+/*
+REGISTER
+*/
+export const registerUser =
+  async (data) => {
+    const res =
+      await axios.post(
+        `${API}/register`,
+        data
+      );
+
+    return res.data;
+  };
+
+/*
+LOGIN
+*/
 export const loginUser =
-  async (form) => {
-
-    const response =
-      await fetch(
-        `${API_URL}/auth/login`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          body: JSON.stringify(form),
-        }
+  async (data) => {
+    const res =
+      await axios.post(
+        `${API}/login`,
+        data
       );
 
-    const data =
-      await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message ||
-        "Login failed"
-      );
-    }
-
-    return data;
-};
+    return res.data;
+  };

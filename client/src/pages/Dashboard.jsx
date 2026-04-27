@@ -4,32 +4,25 @@ import {
 } from "react";
 
 import {
+  useNavigate,
+} from "react-router-dom";
+
+import {
   getPlants,
   deletePlant,
 } from "../services/plantService";
 
 function Dashboard() {
+  const navigate =
+    useNavigate();
+
   const [plants, setPlants] =
     useState([]);
 
   /*
-  GET USER
+  FETCH
   */
-  const storedUser =
-    localStorage.getItem("user");
 
-  const user =
-    storedUser
-      ? JSON.parse(storedUser)
-      : null;
-
-  const isAdmin =
-    user &&
-    user.role === "admin";
-
-  /*
-  FETCH DATA
-  */
   const fetchPlants =
     async () => {
       try {
@@ -37,6 +30,7 @@ function Dashboard() {
           await getPlants();
 
         setPlants(data);
+
       } catch (error) {
         console.log(error);
       }
@@ -49,6 +43,7 @@ function Dashboard() {
   /*
   DELETE
   */
+
   const handleDelete =
     async (id) => {
       if (
@@ -62,8 +57,11 @@ function Dashboard() {
         await deletePlant(id);
 
         fetchPlants();
+
       } catch (error) {
-        console.log(error);
+        alert(
+          "Delete gagal"
+        );
       }
     };
 
@@ -76,11 +74,16 @@ function Dashboard() {
           Dashboard
         </h1>
 
-        {isAdmin && (
-          <button className="bg-green-600 text-white px-4 py-2 rounded">
-            Add Plant
-          </button>
-        )}
+        <button
+          onClick={() =>
+            navigate(
+              "/add-plant"
+            )
+          }
+          className="bg-green-600 text-white px-4 py-2 rounded"
+        >
+          Add Plant
+        </button>
 
       </div>
 
@@ -90,19 +93,17 @@ function Dashboard() {
 
           <tr className="bg-gray-100">
 
-            <th className="p-2 text-left">
+            <th className="p-2">
               Name
             </th>
 
-            <th className="p-2 text-left">
+            <th className="p-2">
               Category
             </th>
 
-            {isAdmin && (
-              <th className="p-2 text-left">
-                Actions
-              </th>
-            )}
+            <th className="p-2">
+              Actions
+            </th>
 
           </tr>
 
@@ -124,28 +125,26 @@ function Dashboard() {
                   {plant.category}
                 </td>
 
-                {isAdmin && (
-                  <td className="p-2 flex gap-2">
+                <td className="p-2 flex gap-2">
 
-                    <button
-                      className="bg-blue-500 text-white px-3 py-1 rounded"
-                    >
-                      Edit
-                    </button>
+                  <button
+                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                  >
+                    Edit
+                  </button>
 
-                    <button
-                      onClick={() =>
-                        handleDelete(
-                          plant._id
-                        )
-                      }
-                      className="bg-red-500 text-white px-3 py-1 rounded"
-                    >
-                      Delete
-                    </button>
+                  <button
+                    onClick={() =>
+                      handleDelete(
+                        plant._id
+                      )
+                    }
+                    className="bg-red-500 text-white px-3 py-1 rounded"
+                  >
+                    Delete
+                  </button>
 
-                  </td>
-                )}
+                </td>
 
               </tr>
             )

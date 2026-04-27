@@ -1,14 +1,42 @@
-const mongoose = require("mongoose");
+const mongoose =
+  require("mongoose");
 
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+const connectDB =
+  async () => {
+    try {
+      console.log(
+        "Connecting to MongoDB..."
+      );
 
-    console.log("MongoDB Connected:", conn.connection.host);
-  } catch (error) {
-    console.error("Database connection error:", error.message);
-    process.exit(1);
-  }
-};
+      await mongoose.connect(
+        process.env.MONGO_URI,
+        {
+          serverSelectionTimeoutMS: 15000,
+        }
+      );
 
-module.exports = connectDB;
+      console.log(
+        "MongoDB connected"
+      );
+
+    } catch (error) {
+      console.error(
+        "MongoDB connection error:"
+      );
+
+      console.error(
+        error.message
+      );
+
+      /*
+      JANGAN crash server
+      */
+
+      console.log(
+        "Server tetap berjalan tanpa database"
+      );
+    }
+  };
+
+module.exports =
+  connectDB;

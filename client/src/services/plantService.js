@@ -1,87 +1,183 @@
-const API_URL = "http://localhost:5000/api/plants";
+import axios from "axios";
 
-export const getPlants = async () => {
-  const response = await fetch(API_URL);
+/*
+================================
+BASE API
+================================
+*/
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch plants");
-  }
+const API =
+  "http://localhost:5000/api/plants";
 
-  return response.json();
-};
+/*
+================================
+GET TOKEN
+================================
+*/
 
-export const getPlantBySlug = async (slug) => {
-  const response = await fetch(
-    `${API_URL}/${slug}`
+const getToken = () => {
+  return localStorage.getItem(
+    "token"
   );
-
-  if (!response.ok) {
-    throw new Error("Plant not found");
-  }
-
-  return response.json();
 };
 
-export const createPlant = async (plantData) => {
-  const token = localStorage.getItem("token");
+/*
+================================
+GET ALL PLANTS
++ FILTER CATEGORY
+================================
+*/
 
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(plantData),
-  });
+export const getPlants =
+  async (category) => {
+    try {
+      let url = API;
 
-  if (!response.ok) {
-    throw new Error("Failed to create plant");
-  }
+      if (category) {
+        url =
+          `${API}?category=${category}`;
+      }
 
-  return response.json();
-};
+      const response =
+        await axios.get(url);
 
-export const updatePlant = async (
-  id,
-  plantData
-) => {
-  const token = localStorage.getItem("token");
+      return response.data;
 
-  const response = await fetch(
-    `${API_URL}/${id}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(plantData),
+    } catch (error) {
+      console.error(
+        "Error fetching plants:",
+        error
+      );
+
+      throw error;
     }
-  );
+  };
 
-  if (!response.ok) {
-    throw new Error("Failed to update plant");
-  }
+/*
+================================
+GET PLANT BY SLUG
+================================
+*/
 
-  return response.json();
-};
+export const getPlantBySlug =
+  async (slug) => {
+    try {
+      const response =
+        await axios.get(
+          `${API}/${slug}`
+        );
 
-export const deletePlant = async (id) => {
-  const token = localStorage.getItem("token");
+      return response.data;
 
-  const response = await fetch(
-    `${API_URL}/${id}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    } catch (error) {
+      console.error(
+        "Error get plant:",
+        error
+      );
+
+      throw error;
     }
-  );
+  };
 
-  if (!response.ok) {
-    throw new Error("Failed to delete plant");
-  }
+/*
+================================
+ADD PLANT
+UPLOAD IMAGE
+================================
+*/
 
-  return response.json();
-};
+export const addPlant =
+  async (formData) => {
+    try {
+      const response =
+        await axios.post(
+          API,
+          formData,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${getToken()}`,
+              "Content-Type":
+                "multipart/form-data",
+            },
+          }
+        );
+
+      return response.data;
+
+    } catch (error) {
+      console.error(
+        "Error add plant:",
+        error
+      );
+
+      throw error;
+    }
+  };
+
+/*
+================================
+UPDATE PLANT
+================================
+*/
+
+export const updatePlant =
+  async (id, formData) => {
+    try {
+      const response =
+        await axios.put(
+          `${API}/${id}`,
+          formData,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${getToken()}`,
+              "Content-Type":
+                "multipart/form-data",
+            },
+          }
+        );
+
+      return response.data;
+
+    } catch (error) {
+      console.error(
+        "Error update plant:",
+        error
+      );
+
+      throw error;
+    }
+  };
+
+/*
+================================
+DELETE PLANT
+================================
+*/
+
+export const deletePlant =
+  async (id) => {
+    try {
+      const response =
+        await axios.delete(
+          `${API}/${id}`,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${getToken()}`,
+            },
+          }
+        );
+
+      return response.data;
+
+    } catch (error) {
+      console.error(
+        "Error delete plant:",
+        error
+      );
+
+      throw error;
+    }
+  };
