@@ -1,42 +1,34 @@
-const mongoose =
-  require("mongoose");
+const { Sequelize } = require("sequelize");
+const path = require("path");
 
-const connectDB =
-  async () => {
-    try {
-      console.log(
-        "Connecting to MongoDB..."
-      );
+// Tentukan path ke file database SQLite
+const dbPath = path.join(__dirname, "../database.sqlite");
 
-      await mongoose.connect(
-        process.env.MONGO_URI,
-        {
-          serverSelectionTimeoutMS: 15000,
-        }
-      );
+// Inisialisasi Sequelize dengan SQLite
+const sequelize = new Sequelize({
+  dialect: "sqlite",
+  storage: dbPath,
+  logging: false, // Set ke console.log jika ingin debug SQL queries
+});
 
-      console.log(
-        "MongoDB connected"
-      );
+// Test connection
+const connectDB = async () => {
+  try {
+    console.log("Connecting to SQLite database...");
 
-    } catch (error) {
-      console.error(
-        "MongoDB connection error:"
-      );
+    await sequelize.authenticate();
 
-      console.error(
-        error.message
-      );
+    console.log("SQLite database connected successfully!");
 
-      /*
-      JANGAN crash server
-      */
+    // Sync models dengan database (create tables jika belum ada)
+    await sequelize.sync({ alter: false });
 
-      console.log(
-        "Server tetap berjalan tanpa database"
-      );
-    }
-  };
+    console.log("Database synchronized!");
 
-module.exports =
-  connectDB;
+  } catch (error) {
+    console.error("SQLite connection error:", error.message);
+    console.log("Server tetap berjalan, tapi database offline");
+  }
+};
+
+module.exports = { sequelize, connectDB };

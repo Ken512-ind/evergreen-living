@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Environment
+.env
+server/.env
+client/.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# Build
+dist/
+build/
+
+# SQLite
+*.sqlite
+*.sqlite3
+
+# Upload (jika tidak ingin dipush)
+server/uploads/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,150 +1,139 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { loginUser } from "../services/authService";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
 
-function Login() {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+const Login = () => {
+  const [email, setEmail] = useState('admin@evergreen.com');
+  const [password, setPassword] = useState('password123');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const [loading, setLoading] =
-    useState(false);
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = authService.getToken();
+    const user = authService.getCurrentUser();
+    
+    if (token && user) {
+      // User sudah login, redirect ke home
+      navigate('/');
+    }
+  }, [navigate]);
 
-  /*
-  HANDLE INPUT
-  */
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]:
-        e.target.value,
-    });
-  };
-
-  /*
-  HANDLE LOGIN
-  */
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
 
-    setLoading(true);
-
-    try {
-      const data =
-        await loginUser(form);
-
-      /*
-      SIMPAN USER
-      */
-      localStorage.setItem(
-        "user",
-        JSON.stringify(
-          data.user
-        )
-      );
-
-      alert(
-        "Login berhasil"
-      );
-
-      /*
-      REFRESH + KEMBALI KE HOME
-      */
-      window.location.href =
-        "/";
-
-    } catch (error) {
-      alert(
-        error.message ||
-          "Login gagal"
-      );
+    // Validation
+    if (!email || !password) {
+      setError('Email and password are required');
+      return;
     }
 
-    setLoading(false);
+    if (!email.includes('@')) {
+      setError('Please enter a valid email');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await authService.loginUser(email, password);
+      
+      if (response.user) {
+        // Login successful - auto refresh page
+        console.log('Login successful, refreshing page...');
+        window.location.reload();
+      } else {
+        setError(response.error || 'Login failed');
+      }
+    } catch (err) {
+      const errorMsg = err.error || err.message || 'Login failed. Please try again.';
+      setError(errorMsg);
+      console.error('Login error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-green-600 mb-2">Evergreen Living</h1>
+          <p className="text-gray-600">Admin Login</p>
+        </div>
 
-      <motion.div
-        initial={{
-          opacity: 0,
-          y: 40,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
-        transition={{
-          duration: 0.4,
-        }}
-        className="bg-white p-8 rounded-xl shadow-md w-96"
-      >
-        <h2 className="text-2xl font-bold text-center mb-6">
-          Login
-        </h2>
+        <form onSubmit={handleLogin} className="space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              {error}
+            </div>
+          )}
 
-        <form
-          onSubmit={
-            handleSubmit
-          }
-        >
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            required
-            value={
-              form.email
-            }
-            onChange={
-              handleChange
-            }
-            className="w-full border p-2 mb-3 rounded"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError('');
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            required
-            value={
-              form.password
-            }
-            onChange={
-              handleChange
-            }
-            className="w-full border p-2 mb-4 rounded"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError('');
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
 
           <button
             type="submit"
-            disabled={
-              loading
-            }
-            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+            disabled={loading}
+            className="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading
-              ? "Loading..."
-              : "Login"}
+            {loading ? 'Loading...' : 'Login'}
           </button>
         </form>
 
-        <p className="text-sm text-center mt-4">
-          Belum punya akun?
-          <Link
-            to="/register"
-            className="text-green-600 ml-1 hover:underline"
-          >
-            Daftar
-          </Link>
-        </p>
+        <div className="mt-6 text-center">
+          <p className="text-gray-600">
+            Don't have an account?{' '}
+            <a href="/register" className="text-green-600 font-semibold hover:underline">
+              Register here
+            </a>
+          </p>
+        </div>
 
-      </motion.div>
+        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p className="text-sm font-semibold text-blue-900 mb-2">Test Credentials:</p>
+          <p className="text-sm text-blue-800">
+            Email: <code className="bg-blue-100 px-2 py-1 rounded">admin@evergreen.com</code>
+          </p>
+          <p className="text-sm text-blue-800">
+            Password: <code className="bg-blue-100 px-2 py-1 rounded">password123</code>
+          </p>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default Login;

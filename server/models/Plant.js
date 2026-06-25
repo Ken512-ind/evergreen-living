@@ -1,43 +1,50 @@
-const mongoose =
-  require("mongoose");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/db");
 
-const plantSchema =
-  new mongoose.Schema(
-    {
-      name: {
-        type: String,
-        required: true,
-      },
-
-      latin: {
-        type: String,
-      },
-
-      category: {
-        type: String,
-        required: true,
-      },
-
-      description: {
-        type: String,
-      },
-
-      image: {
-        type: String,
-      },
-
-      slug: {
-        type: String,
-        unique: true,
-      },
+const Plant = sequelize.define(
+  "Plant",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-    {
-      timestamps: true,
-    }
-  );
 
-module.exports =
-  mongoose.model(
-    "Plant",
-    plantSchema
-  );
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+
+    latin: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    category: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
+    image: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+  },
+  {
+    timestamps: true,
+    tableName: "plants",
+  }
+);
+
+module.exports = Plant;
