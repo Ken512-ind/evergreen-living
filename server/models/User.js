@@ -1,18 +1,21 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("../config/db");
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/db.js";
 
 const User = sequelize.define(
   "User",
   {
     id: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       autoIncrement: true,
+      primaryKey: true,
     },
 
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
 
     email: {
@@ -21,6 +24,7 @@ const User = sequelize.define(
       unique: true,
       validate: {
         isEmail: true,
+        notEmpty: true,
       },
     },
 
@@ -35,9 +39,9 @@ const User = sequelize.define(
     },
   },
   {
-    timestamps: true,
     tableName: "users",
+    timestamps: true,
   }
 );
 
-module.exports = User;
+export default User;

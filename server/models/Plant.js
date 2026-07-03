@@ -1,5 +1,5 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("../config/db");
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/db.js";
 
 const Plant = sequelize.define(
   "Plant",
@@ -13,6 +13,9 @@ const Plant = sequelize.define(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
 
     latin: {
@@ -40,11 +43,31 @@ const Plant = sequelize.define(
       allowNull: false,
       unique: true,
     },
+
+    watering: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    sunlight: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    temperature: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    difficulty: {
+      type: DataTypes.ENUM("Easy", "Medium", "Hard"),
+      defaultValue: "Easy",
+    },
   },
   {
-    timestamps: true,
     tableName: "plants",
+    timestamps: true,
   }
 );
 
-module.exports = Plant;
+export default Plant;

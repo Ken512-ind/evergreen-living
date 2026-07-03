@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-import { registerUser } from "../services/authService";
+import toast from "react-hot-toast";
+
+import { register } from "../services/authService";
 
 function Register() {
   const navigate = useNavigate();
@@ -12,42 +14,33 @@ function Register() {
     password: "",
   });
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  /*
-  HANDLE INPUT
-  */
   const handleChange = (e) => {
     setForm({
       ...form,
-      [e.target.name]:
-        e.target.value,
+      [e.target.name]: e.target.value,
     });
   };
 
-  /*
-  SUBMIT REGISTER
-  */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (loading) return;
 
     try {
       setLoading(true);
 
-      await registerUser(form);
+      await register(form);
 
-      alert(
-        "Registrasi berhasil"
-      );
+      toast.success("Registrasi berhasil!");
 
       navigate("/login");
 
     } catch (error) {
-      alert(
-        error.response?.data
-          ?.message ||
-          "Register gagal"
+      toast.error(
+        error.response?.data?.message ||
+          "Registrasi gagal."
       );
     } finally {
       setLoading(false);
@@ -55,18 +48,16 @@ function Register() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4">
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow w-full max-w-md"
+        className="bg-white shadow-lg rounded-xl p-6 sm:p-8 w-full max-w-md"
       >
 
-        <h2 className="text-2xl font-bold mb-6 text-center">
+        <h1 className="text-2xl sm:text-3xl font-bold text-center text-green-600 mb-6">
           Register
-        </h2>
-
-        {/* NAME */}
+        </h1>
 
         <input
           type="text"
@@ -74,11 +65,9 @@ function Register() {
           placeholder="Nama"
           value={form.name}
           onChange={handleChange}
+          className="w-full border rounded-lg px-4 py-2 mb-4"
           required
-          className="w-full mb-4 px-4 py-2 border rounded"
         />
-
-        {/* EMAIL */}
 
         <input
           type="email"
@@ -86,11 +75,9 @@ function Register() {
           placeholder="Email"
           value={form.email}
           onChange={handleChange}
+          className="w-full border rounded-lg px-4 py-2 mb-4"
           required
-          className="w-full mb-4 px-4 py-2 border rounded"
         />
-
-        {/* PASSWORD */}
 
         <input
           type="password"
@@ -98,23 +85,19 @@ function Register() {
           placeholder="Password"
           value={form.password}
           onChange={handleChange}
+          className="w-full border rounded-lg px-4 py-2 mb-6"
           required
-          className="w-full mb-6 px-4 py-2 border rounded"
         />
-
-        {/* BUTTON */}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+          className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading
-            ? "Loading..."
-            : "Register"}
+          {loading ? "Loading..." : "Register"}
         </button>
 
-        <p className="text-center mt-4">
+        <p className="text-center mt-6">
 
           Sudah punya akun?
 

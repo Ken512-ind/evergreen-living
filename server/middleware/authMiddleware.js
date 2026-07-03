@@ -1,42 +1,38 @@
-const jwt =
-  require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
-const authMiddleware =
-  (req, res, next) => {
-    try {
-      const token =
-        req.header(
-          "Authorization"
-        );
+const authMiddleware = (req, res, next) => {
+  try {
 
-      if (!token) {
-        return res.status(401).json({
-          message:
-            "No token",
-        });
-      }
+    const authHeader =
+      req.headers.authorization;
 
-      const decoded =
-        jwt.verify(
-          token.replace(
-            "Bearer ",
-            ""
-          ),
-          process.env.JWT_SECRET
-        );
-
-      req.user =
-        decoded;
-
-      next();
-
-    } catch (error) {
-      res.status(401).json({
-        message:
-          "Invalid token",
+    if (!authHeader) {
+      return res.status(401).json({
+        message: "Access denied. No token provided.",
       });
     }
-  };
 
-module.exports =
-  authMiddleware;
+    const token =
+      authHeader.startsWith("Bearer ")
+        ? authHeader.slice(7)
+        : authHeader;
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+
+    req.user = decoded;
+
+    next();
+
+  } catch (error) {
+
+    return res.status(401).json({
+      message: "Invalid or expired token.",
+    });
+
+  }
+};
+
+export default authMiddleware;

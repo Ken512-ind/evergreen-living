@@ -1,16 +1,17 @@
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 /*
+====================================
 REGISTER
+====================================
 */
 
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validation
     if (!name || !email || !password) {
       return res.status(400).json({
         message: "Name, email, and password are required",
@@ -23,10 +24,6 @@ const register = async (req, res) => {
       });
     }
 
-    /*
-    CHECK USER
-    */
-
     const existingUser = await User.findOne({
       where: { email },
     });
@@ -37,15 +34,7 @@ const register = async (req, res) => {
       });
     }
 
-    /*
-    HASH PASSWORD
-    */
-
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    /*
-    CREATE USER
-    */
 
     const user = await User.create({
       name,
@@ -54,82 +43,71 @@ const register = async (req, res) => {
       role: "user",
     });
 
-    // Return user without password
-    const userResponse = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    };
-
     res.status(201).json({
-      message: "User registered successfully",
-      user: userResponse,
+      message: "Register successful",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
 
   } catch (error) {
-    console.error("ERROR register:", error.message);
+
+    console.error(error);
+
     res.status(500).json({
-      message: "Registration failed",
-      error: error.message,
+      message: error.message,
     });
+
   }
 };
 
 /*
+====================================
 LOGIN
+====================================
 */
 
 const login = async (req, res) => {
   try {
+
     const { email, password } = req.body;
 
-    // Validation
     if (!email || !password) {
       return res.status(400).json({
         message: "Email and password are required",
       });
     }
 
-    /*
-    FIND USER
-    */
-
     const user = await User.findOne({
       where: { email },
     });
 
     if (!user) {
-      return res.status(400).json({
-        message: "Invalid credentials",
+      return res.status(401).json({
+        message: "Invalid email or password",
       });
     }
 
-    /*
-    CHECK PASSWORD
-    */
-
-    const isMatch = await bcrypt.compare(
+    const match = await bcrypt.compare(
       password,
       user.password
     );
 
-    if (!isMatch) {
-      return res.status(400).json({
-        message: "Invalid credentials",
+    if (!match) {
+      return res.status(401).json({
+        message: "Invalid email or password",
       });
     }
-
-    /*
-    CREATE TOKEN
-    */
 
     const token = jwt.sign(
       {
         id: user.id,
         role: user.role,
       },
-      process.env.JWT_SECRET || "your-secret-key-change-in-production",
+      process.env.JWT_SECRET,
       {
         expiresIn: "7d",
       }
@@ -147,15 +125,52 @@ const login = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("ERROR login:", error.message);
+
+    console.error(error);
+
     res.status(500).json({
-      message: "Login failed",
-      error: error.message,
+      message: error.message,
     });
+
   }
 };
 
-module.exports = {
+/*
+====================================
+GET PROFILE
+====================================
+*/
+
+const getProfile = async (req, res) => {
+  try {
+
+    const user = await User.findByPk(req.user.id, {
+      attributes: {
+        exclude: ["password"],
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    res.json(user);
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: error.message,
+    });
+
+  }
+};
+
+export {
   register,
   login,
+  getProfile,
 };

@@ -1,34 +1,34 @@
-const { Sequelize } = require("sequelize");
-const path = require("path");
+import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
 
-// Tentukan path ke file database SQLite
-const dbPath = path.join(__dirname, "../database.sqlite");
+dotenv.config();
 
-// Inisialisasi Sequelize dengan SQLite
-const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage: dbPath,
-  logging: false, // Set ke console.log jika ingin debug SQL queries
-});
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: "mysql",
+    logging: false,
+  }
+);
 
-// Test connection
 const connectDB = async () => {
   try {
-    console.log("Connecting to SQLite database...");
+    console.log("Connecting to MySQL...");
 
     await sequelize.authenticate();
 
-    console.log("SQLite database connected successfully!");
+    console.log("MySQL connected successfully!");
 
-    // Sync models dengan database (create tables jika belum ada)
     await sequelize.sync({ alter: false });
 
     console.log("Database synchronized!");
-
   } catch (error) {
-    console.error("SQLite connection error:", error.message);
-    console.log("Server tetap berjalan, tapi database offline");
+    console.error("MySQL connection error:", error.message);
   }
 };
 
-module.exports = { sequelize, connectDB };
+export { sequelize, connectDB };

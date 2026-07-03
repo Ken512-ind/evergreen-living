@@ -1,137 +1,130 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import authService from '../services/authService';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+
+import toast from "react-hot-toast";
+
+import {
+  login,
+  getCurrentUser,
+  isAuthenticated,
+} from "../services/authService";
 
 const Login = () => {
-  const [email, setEmail] = useState('admin@evergreen.com');
-  const [password, setPassword] = useState('password123');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Check if user is already logged in
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
-    const token = authService.getToken();
-    const user = authService.getCurrentUser();
-    
-    if (token && user) {
-      // User sudah login, redirect ke home
-      navigate('/');
+    const user = getCurrentUser();
+
+    if (user && isAuthenticated()) {
+      navigate("/");
     }
   }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
 
-    // Validation
+    setError("");
+
     if (!email || !password) {
-      setError('Email and password are required');
-      return;
-    }
-
-    if (!email.includes('@')) {
-      setError('Please enter a valid email');
+      setError("Email dan password wajib diisi.");
       return;
     }
 
     try {
       setLoading(true);
-      const response = await authService.loginUser(email, password);
-      
+
+      const response = await login(email, password);
+
       if (response.user) {
-        // Login successful - auto refresh page
-        console.log('Login successful, refreshing page...');
-        window.location.reload();
-      } else {
-        setError(response.error || 'Login failed');
+        toast.success(`Welcome back, ${response.user.name}!`);
+
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1200);
       }
     } catch (err) {
-      const errorMsg = err.error || err.message || 'Login failed. Please try again.';
-      setError(errorMsg);
-      console.error('Login error:', err);
+      const message =
+        err.response?.data?.message ||
+        "Email atau password salah.";
+
+      setError(message);
+
+      toast.error(message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-green-600 mb-2">Evergreen Living</h1>
-          <p className="text-gray-600">Admin Login</p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {error}
-            </div>
-          )}
+      <div className="bg-white shadow-lg rounded-xl p-6 sm:p-8 w-full max-w-md">
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError('');
-              }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="Enter your email"
-              required
-            />
+        <h1 className="text-2xl sm:text-3xl font-bold text-center text-green-600 mb-6">
+          Login
+        </h1>
+
+        {error && (
+          <div className="mb-4 bg-red-100 text-red-700 px-4 py-2 rounded">
+            {error}
           </div>
+        )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setError('');
-              }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
+        <form
+          onSubmit={handleLogin}
+          className="space-y-4"
+        >
+
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full border rounded-lg px-4 py-2"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full border rounded-lg px-4 py-2"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+          />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Loading...' : 'Login'}
+            {loading ? "Loading..." : "Login"}
           </button>
+
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
-            <a href="/register" className="text-green-600 font-semibold hover:underline">
-              Register here
-            </a>
-          </p>
-        </div>
+        <p className="text-center mt-6">
 
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm font-semibold text-blue-900 mb-2">Test Credentials:</p>
-          <p className="text-sm text-blue-800">
-            Email: <code className="bg-blue-100 px-2 py-1 rounded">admin@evergreen.com</code>
-          </p>
-          <p className="text-sm text-blue-800">
-            Password: <code className="bg-blue-100 px-2 py-1 rounded">password123</code>
-          </p>
-        </div>
+          Belum punya akun?
+
+          <Link
+            to="/register"
+            className="text-green-600 ml-1"
+          >
+            Register
+          </Link>
+
+        </p>
+
       </div>
+
     </div>
   );
 };

@@ -1,26 +1,20 @@
 import { Navigate } from "react-router-dom";
+import {
+  getCurrentUser,
+  isAuthenticated,
+} from "../services/authService";
 
 const AdminRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
-
-  /*
-  NOT LOGGED IN
-  */
-  if (!token) {
-    return <Navigate to="/login" />;
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
   }
 
-  /*
-  NOT ADMIN
-  */
-  if (role !== "admin") {
-    return <Navigate to="/" />;
+  const user = getCurrentUser();
+
+  if (!user || user.role !== "admin") {
+    return <Navigate to="/" replace />;
   }
 
-  /*
-  ALLOWED
-  */
   return children;
 };
 

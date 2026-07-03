@@ -1,167 +1,205 @@
-import {
-  useState,
-} from "react";
-
-import {
-  useNavigate,
-} from "react-router-dom";
-
-import {
-  addPlant,
-} from "../services/plantService";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createPlant } from "../services/plantService";
+import toast from "react-hot-toast";
 
 function AddPlant() {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
-  const [form, setForm] =
-    useState({
-      name: "",
-      latin: "",
-      category: "",
-      description: "",
-      image: null,
-    });
+  const [form, setForm] = useState({
+    name: "",
+    latin: "",
+    category: "",
+    description: "",
+    slug: "",
+    watering: "",
+    sunlight: "",
+    temperature: "",
+    difficulty: "",
+    image: null,
+  });
 
-  const handleChange =
-    (e) => {
-      const {
-        name,
-        value,
-        files,
-      } = e.target;
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-      if (name === "image") {
-        setForm({
-          ...form,
-          image:
-            files[0],
-        });
-      } else {
-        setForm({
-          ...form,
-          [name]:
-            value,
-        });
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+
+    if (name === "image") {
+      const file = files[0];
+
+      setForm((prev) => ({
+        ...prev,
+        image: file,
+      }));
+
+      if (file) {
+        setPreview(URL.createObjectURL(file));
       }
-    };
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
 
-  const handleSubmit =
-    async (e) => {
-      e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-      try {
-        const formData =
-          new FormData();
+    if (loading) return;
+    setLoading(true);
 
-        Object.keys(
-          form
-        ).forEach(
-          (key) => {
-            formData.append(
-              key,
-              form[key]
-            );
-          }
-        );
+    try {
+      const formData = new FormData();
 
-        await addPlant(
-          formData
-        );
+      Object.entries(form).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
 
-        alert(
-          "Plant added"
-        );
+      await createPlant(formData);
 
-        navigate(
-          "/dashboard"
-        );
+      toast.success("Plant created successfully!");
 
-      } catch (error) {
-        alert(
-          "Error"
-        );
-      }
-    };
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to create plant.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
+    <div className="max-w-3xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">Add Plant</h1>
 
-      <h1 className="text-2xl font-bold mb-6">
-        Add Plant
-      </h1>
-
-      <form
-        onSubmit={
-          handleSubmit
-        }
-        className="space-y-4"
-      >
+      <form onSubmit={handleSubmit} className="space-y-4">
 
         <input
+          type="text"
           name="name"
-          placeholder="Name"
-          onChange={
-            handleChange
-          }
-          className="w-full border p-2"
+          placeholder="Plant Name"
+          value={form.name}
+          onChange={handleChange}
+          className="w-full border rounded p-2"
         />
 
         <input
+          type="text"
           name="latin"
           placeholder="Latin Name"
-          onChange={
-            handleChange
-          }
-          className="w-full border p-2"
+          value={form.latin}
+          onChange={handleChange}
+          className="w-full border rounded p-2"
+        />
+
+        <input
+          type="text"
+          name="slug"
+          placeholder="Slug"
+          value={form.slug}
+          onChange={handleChange}
+          className="w-full border rounded p-2"
         />
 
         <select
           name="category"
-          onChange={
-            handleChange
-          }
-          className="w-full border p-2"
+          value={form.category}
+          onChange={handleChange}
+          className="w-full border rounded p-2"
         >
-          <option>
-            Select Category
-          </option>
-
-          <option value="indoor">
-            Indoor
-          </option>
-
-          <option value="herbal">
-            Herbal
-          </option>
+          <option value="">Choose Category</option>
+          <option value="Indoor">Indoor</option>
+          <option value="Herbal">Herbal</option>
         </select>
 
         <textarea
           name="description"
           placeholder="Description"
-          onChange={
-            handleChange
-          }
-          className="w-full border p-2"
+          value={form.description}
+          onChange={handleChange}
+          className="w-full border rounded p-2"
+        />
+
+        <input
+          type="text"
+          name="watering"
+          placeholder="Watering"
+          value={form.watering}
+          onChange={handleChange}
+          className="w-full border rounded p-2"
+        />
+
+        <input
+          type="text"
+          name="sunlight"
+          placeholder="Sunlight"
+          value={form.sunlight}
+          onChange={handleChange}
+          className="w-full border rounded p-2"
+        />
+
+        <input
+          type="text"
+          name="temperature"
+          placeholder="Temperature"
+          value={form.temperature}
+          onChange={handleChange}
+          className="w-full border rounded p-2"
+        />
+
+        <input
+          type="text"
+          name="difficulty"
+          placeholder="Difficulty"
+          value={form.difficulty}
+          onChange={handleChange}
+          className="w-full border rounded p-2"
         />
 
         <input
           type="file"
           name="image"
-          onChange={
-            handleChange
-          }
+          onChange={handleChange}
           className="w-full"
         />
 
+        {preview && (
+          <div className="mt-4">
+            <p className="text-sm text-gray-500 mb-2">
+              Image Preview
+            </p>
+
+            <img
+              src={preview}
+              alt="Preview"
+              className="w-56 h-56 object-cover rounded-xl border shadow"
+            />
+          </div>
+        )}
+
         <button
-          className="bg-green-600 text-white px-4 py-2 rounded"
+          type="submit"
+          disabled={loading}
+          className={`
+            w-full
+            bg-green-600
+            text-white
+            py-3
+            rounded-xl
+            transition
+            ${
+              loading
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-green-700"
+            }
+          `}
         >
-          Submit
+          {loading ? "Saving..." : "Save Plant"}
         </button>
 
       </form>
-
     </div>
   );
 }

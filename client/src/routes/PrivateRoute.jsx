@@ -1,10 +1,9 @@
 import { Navigate } from "react-router-dom";
+import { isAuthenticated } from "../services/authService";
 
 const PrivateRoute = ({ children }) => {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    return <Navigate to="/login" />;
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
   }
 
   return children;

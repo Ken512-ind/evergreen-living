@@ -3,6 +3,7 @@ import Collection from "../components/Collection";
 import GrowPlant from "../components/GrowPlant";
 import CareSteps from "../components/CareSteps";
 import ContactSection from "../components/ContactSection";
+import FeaturedPlants from "../components/FeaturedPlants";
 
 function Home() {
   return (
@@ -11,6 +12,8 @@ function Home() {
       <Hero />
 
       <Collection />
+
+      <FeaturedPlants />
 
       <GrowPlant />
 
@@ -21,5 +24,4 @@ function Home() {
     </div>
   );
 }
-
 export default Home;

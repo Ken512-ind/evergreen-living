@@ -1,75 +1,77 @@
-import axios from 'axios';
+import api from "./api";
 
-const API_URL = 'http://localhost:5000/api/auth';
+// ==========================
+// LOGIN
+// ==========================
+export const login = async (email, password) => {
+  try {
+    const response = await api.post("/auth/login", {
+      email,
+      password,
+    });
 
-const authService = {
-  // Register user
-  registerUser: async (userData) => {
-    try {
-      const response = await axios.post(`${API_URL}/register`, userData);
-      if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        localStorage.setItem('token', response.data.token);
-      }
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { error: 'Registration failed' };
-    }
-  },
+    const { token, user } = response.data;
 
-  // Login user
-  loginUser: async (email, password) => {
-    try {
-      const response = await axios.post(`${API_URL}/login`, {
-        email,
-        password,
-      });
-      if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        localStorage.setItem('token', response.data.token);
-      }
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || { error: 'Login failed' };
-    }
-  },
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
 
-  // Logout user
-  logoutUser: () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-  },
-
-  // Get current user
-  getCurrentUser: () => {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
-  },
-
-  // Get token
-  getToken: () => {
-    return localStorage.getItem('token');
-  },
-
-  // Check if authenticated
-  isAuthenticated: () => {
-    return !!localStorage.getItem('token');
-  },
-
-  // Check if admin
-  isAdmin: () => {
-    const user = authService.getCurrentUser();
-    return user?.role === 'admin';
-  },
+    return response.data;
+  } catch (error) {
+    console.error("Login Error:", error);
+    throw error;
+  }
 };
 
-export default authService;
+// ==========================
+// REGISTER
+// ==========================
+export const register = async (userData) => {
+  try {
+    const response = await api.post("/auth/register", userData);
 
-// Named exports untuk compatibility
-export const registerUser = authService.registerUser;
-export const loginUser = authService.loginUser;
-export const logoutUser = authService.logoutUser;
-export const getCurrentUser = authService.getCurrentUser;
-export const getToken = authService.getToken;
-export const isAuthenticated = authService.isAuthenticated;
-export const isAdmin = authService.isAdmin;
+    return response.data;
+  } catch (error) {
+    console.error("Register Error:", error);
+    throw error;
+  }
+};
+
+// ==========================
+// PROFILE
+// ==========================
+export const getProfile = async () => {
+  try {
+    const response = await api.get("/auth/profile");
+
+    return response.data;
+  } catch (error) {
+    console.error("Profile Error:", error);
+    throw error;
+  }
+};
+
+// ==========================
+// LOGOUT
+// ==========================
+export const logout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+};
+
+// ==========================
+// GET USER
+// ==========================
+export const getCurrentUser = () => {
+  const user = localStorage.getItem("user");
+
+  if (!user) return null;
+
+  return JSON.parse(user);
+};
+
+// ==========================
+// CHECK LOGIN
+// ==========================
+export const isAuthenticated = () => {
+  return !!localStorage.getItem("token");
+};

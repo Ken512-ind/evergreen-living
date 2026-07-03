@@ -5,21 +5,24 @@ import {
 } from "react-router-dom";
 
 import { AnimatePresence } from "framer-motion";
+import { Toaster } from "react-hot-toast";
 
 import Navbar from "./components/Navbar";
+import PageWrapper from "./components/PageWrapper";
 
 import Home from "./pages/Home";
 import IndoorPlants from "./pages/IndoorPlants";
 import HerbalPlants from "./pages/HerbalPlants";
 import PlantDetail from "./pages/PlantDetail";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-
-import AdminRoute from "./components/AdminRoute";
-import PageWrapper from "./components/PageWrapper";
-
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 import AddPlant from "./pages/AddPlant";
+import EditPlant from "./pages/EditPlant";
+import NotFound from "./pages/NotFound";
+
+
+import AdminRoute from "./routes/AdminRoute";
 
 function App() {
   const location = useLocation();
@@ -85,7 +88,7 @@ function App() {
                 <Register />
               </PageWrapper>
             }
-          />  
+          />
 
           <Route
             path="/dashboard"
@@ -108,10 +111,43 @@ function App() {
               </AdminRoute>
             }
           />
+          
+          <Route
+            path="/edit-plant/:id"
+            element={
+              <AdminRoute>
+                <PageWrapper>
+                  <EditPlant />
+                </PageWrapper>
+              </AdminRoute>
+            }
+          />
 
+          <Route
+            path="*"
+            element={
+              <PageWrapper>
+                <NotFound />
+              </PageWrapper>
+            }
+          />
         </Routes>
       </AnimatePresence>
-    </>
+
+      <Toaster
+          position="top-right"
+          reverseOrder={false}
+          toastOptions={{
+            duration: 3000,
+            style: {
+            borderRadius: "12px",
+            background: "#1f2937",
+            color: "#fff",
+        },
+      }}
+    />
+
+  </>
   );
 }
 
