@@ -1,39 +1,116 @@
-# Evergreen Living
+Evergreen Living
 
-Website katalog tanaman hias dan herbal berbasis React.
+Evergreen Living adalah aplikasi web yang menyediakan informasi tanaman
+hias indoor dan tanaman herbal. Pengguna dapat melihat daftar tanaman,
+detail tanaman, serta melakukan autentikasi. Admin memiliki akses untuk
+mengelola data tanaman melalui dashboard.
 
-Project ini masih dalam tahap pengembangan.
-Fitur akan terus ditambahkan.
+Fitur
 
-Tech Stack:
-- React
-- Vite
-- Tailwind CSS
-- React Router
+Pengguna
 
-## Latest Update (April 2026)
+-   Melihat daftar tanaman indoor.
+-   Melihat daftar tanaman herbal.
+-   Melihat detail tanaman.
+-   Login dan Register.
+-   Responsive pada desktop dan mobile.
 
-Today's development focused on improving system functionality and user experience.
+Admin
 
-### Backend
+-   Login Admin.
+-   Dashboard Admin.
+-   Menambah tanaman.
+-   Mengubah data tanaman.
+-   Menghapus tanaman.
+-   Upload gambar tanaman.
 
-* Added login authentication system using JWT
-* Ensured plant data API returns image field correctly
-* Improved plant detail retrieval using slug
+Teknologi
 
-### Frontend
+Frontend
 
-* Implemented login form and authentication flow
-* Fixed plant images loading from database
-* Added smooth animations using Framer Motion
-* Improved responsive layout for mobile and desktop
-* Enhanced hover animation on plant cards
+-   React
+-   Vite
+-   React Router
+-   Axios
+-   Framer Motion
 
-## Latest Update
+Backend
 
-- Implemented user authentication (login & register)
-- Added admin route protection for dashboard
-- Added logout functionality
-- Implemented page transition animations using Framer Motion
-- Improved navbar and homepage UI
-- Added role-based access control for edit and delete actions
+-   Node.js
+-   Express.js
+-   Sequelize
+-   MySQL
+-   JWT Authentication
+-   Multer
+
+Deployment
+
+-   Ubuntu VPS
+-   Nginx
+-   PM2
+-   Let’s Encrypt SSL
+
+Struktur Project
+
+    client/
+    server/
+
+Instalasi
+
+Clone Repository
+
+    git clone https://github.com/Ken512-ind/evergreen-living.git
+
+Frontend
+
+    cd client
+    npm install
+    npm run dev
+
+Backend
+
+    cd server
+    npm install
+    npm start
+
+Environment
+
+Frontend
+
+    VITE_API_URL=https://evergreen-livingid.cloud
+
+Backend
+
+    DB_HOST=
+    DB_USER=
+    DB_PASSWORD=
+    DB_NAME=
+    JWT_SECRET=
+    PORT=5000
+
+Deployment
+
+-   Ubuntu VPS
+-   PM2 sebagai Process Manager
+-   Nginx sebagai Reverse Proxy
+-   HTTPS menggunakan Let’s Encrypt
+-   Domain custom
+
+Website
+
+https://evergreen-livingid.cloud
+
+Repository
+
+https://github.com/Ken512-ind/evergreen-living
+
+Tim Pengembang
+
+Kelompok 2
+
+-   Hafidz Nurhasan
+
+Lisensi
+
+Project ini dibuat untuk memenuhi tugas mata kuliah Pemrograman Web &
+Praktikum Universitas Muhammadiyah Kuningan.
