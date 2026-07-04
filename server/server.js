@@ -36,6 +36,10 @@ app.use(
       "http://localhost:5173",
       "http://localhost:3000",
       "http://localhost:5000",
+      "http://evergreen-livingid.cloud",
+      "https://evergreen-livingid.cloud",
+      "http://www.evergreen-livingid.cloud/",
+      "https://www.evergreen-livingid.cloud/",
     ],
     credentials: true,
   })
